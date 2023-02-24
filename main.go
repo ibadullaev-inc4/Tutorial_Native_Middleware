@@ -27,7 +27,8 @@ var users []Users
 func main() {
 
 	http.HandleFunc("/", loggingMiddleware(myMiddleware(usersHandler)))
-	http.HandleFunc("/user/:id", myMiddleware(userHandler))
+	http.HandleFunc("/user", myMiddleware(userHandler))
+	http.HandleFunc("/users", myMiddleware(getUsersHandler))
 	http.ListenAndServe(":8082", nil)
 }
 
@@ -46,6 +47,16 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		getUser(w, r)
+	default:
+		w.WriteHeader(http.StatusNotImplemented)
+	}
+
+}
+
+func getUsersHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		getUsers(w, r)
 	default:
 		w.WriteHeader(http.StatusNotImplemented)
 	}
@@ -75,9 +86,13 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 
 func getUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	// userId := r.Body
-	resp, _ := json.Marshal(users)
-	w.Write(resp)
+	id := r.URL.Query().Get("id")
+	fmt.Println("id =>", id)
+	for _, item := range users {
+		if item.Name == id {
+			json.NewEncoder(w).Encode(item)
+		}
+	}
 }
 
 func addUser(w http.ResponseWriter, r *http.Request) {
