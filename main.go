@@ -24,8 +24,15 @@ var user Users = Users{
 
 var users []Users
 
-func main() {
+func print() {
+	menu := map[string]interface{}{"hello": "world"}
+	json, _ := json.Marshal(menu)
+	fmt.Println(string(json))
 
+}
+
+func main() {
+	print()
 	http.HandleFunc("/", loggingMiddleware(myMiddleware(usersHandler)))
 	http.HandleFunc("/user", myMiddleware(userHandler))
 	http.HandleFunc("/users", myMiddleware(getUsersHandler))
